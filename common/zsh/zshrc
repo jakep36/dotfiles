@@ -22,7 +22,7 @@ fi
 
 # OpenCode (macOS specific path)
 if [[ "$OS" == "macos" ]]; then
-    export PATH="$HOME/.opencode/bin:$PATH"
+    export PATH="/Users/jparsell/.opencode/bin:$PATH"
 fi
 
 # Bun configuration
@@ -31,7 +31,7 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # Bun completions (macOS specific path)
 if [[ "$OS" == "macos" ]]; then
-    [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+    [ -s "/Users/jparsell/.bun/_bun" ] && source "/Users/jparsell/.bun/_bun"
 else
     [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 fi
@@ -76,9 +76,6 @@ fi
 
 # Claude Code
 export PATH="$HOME/.claude/local:$PATH"
-alias claude="~/.claude/local/claude"
-alias cat="bat"
-
 
 # Zsh history configuration for sharing across terminals
 HISTFILE=~/.zsh_history
