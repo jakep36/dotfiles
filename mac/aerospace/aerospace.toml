@@ -5,11 +5,17 @@
 start-at-login = true
 
 # Commands to run after startup
-after-startup-command = []
+after-startup-command = [
+    'exec-and-forget bash -c "sleep 3 && /Users/jparsell/dotfiles/fix-aerospace.sh"'
+]
 
 # Normalizations. See: https://nikitabobko.github.io/AeroSpace/guide#normalization
-enable-normalization-flatten-containers = true
-enable-normalization-opposite-orientation-for-nested-containers = true
+enable-normalization-flatten-containers = false
+enable-normalization-opposite-orientation-for-nested-containers = false
+
+# Force all new windows to tile by default
+[[on-window-detected]]
+run = 'layout tiling'
 
 # See: https://nikitabobko.github.io/AeroSpace/guide#layouts
 # The 'accordion-padding' specifies the size of accordion padding
@@ -50,12 +56,12 @@ preset = 'qwerty'
 #                 See:
 #                 https://nikitabobko.github.io/AeroSpace/guide#assign-workspaces-to-monitors
 [gaps]
-inner.horizontal = 10
-inner.vertical = 10
-outer.left = 10
-outer.bottom = 10
-outer.top = 10
-outer.right = 10
+inner.horizontal = 50
+inner.vertical = 50
+outer.left = 20
+outer.bottom = 20
+outer.top = 20
+outer.right = 20
 
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
@@ -86,6 +92,7 @@ cmd-enter = 'exec-and-forget open -a "Alacritty" || open -a "Terminal"'
 # Layout management
 cmd-t = 'layout tiles horizontal vertical'        # Toggle tiling
 cmd-f = 'layout floating tiling'                  # Toggle floating
+cmd-shift-f = 'layout floating tiling'            # Alternative floating toggle
 cmd-shift-space = 'layout tiles accordion'        # Toggle layout mode
 alt-slash = 'layout tiles horizontal vertical'     # Alternative
 alt-comma = 'layout accordion horizontal vertical' # Alternative
@@ -214,7 +221,7 @@ alt-shift-z = 'move-node-to-workspace Z'
 
 # Additional keybindings
 cmd-q = 'close'                                    # Close window (like Linux)
-cmd-shift-f = 'fullscreen'                         # Toggle fullscreen
+cmd-shift-enter = 'fullscreen'                    # Toggle fullscreen
 
 # Workspace back and forth
 cmd-tab = 'workspace-back-and-forth'
@@ -228,6 +235,16 @@ alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
 # Service mode
 cmd-shift-semicolon = 'mode service'
 alt-shift-semicolon = 'mode service'  # Keep alt version too
+
+# App-specific floating rules
+[[on-window-detected]]
+if.app-id = 'com.apple.Passwords'
+run = 'layout floating'
+
+# Multiple attempts to make Passwords float
+[[on-window-detected]]
+if.app-name-regex-substring = '^Passwords$'
+run = 'layout floating'
 
 # 'service' binding mode declaration.
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes

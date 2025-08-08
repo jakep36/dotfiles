@@ -1,14 +1,165 @@
+# Cross-platform .zshrc for macOS and Linux
+# Detects OS and configures appropriately
 
-# opencode
-export PATH=/Users/jparsell/.opencode/bin:$PATH
+# OS Detection
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    OS="macos"
+    DISTRO="macos"
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    OS="linux"
+    # Detect specific Linux distribution
+    if [ -f /etc/arch-release ]; then
+        DISTRO="arch"
+    elif [ -f /etc/debian_version ]; then
+        DISTRO="debian"
+    else
+        DISTRO="unknown"
+    fi
+else
+    OS="unknown"
+    DISTRO="unknown"
+fi
 
-# bun completions
-[ -s "/Users/jparsell/.bun/_bun" ] && source "/Users/jparsell/.bun/_bun"
+# OpenCode (macOS specific path)
+if [[ "$OS" == "macos" ]]; then
+    export PATH="/Users/jparsell/.opencode/bin:$PATH"
+fi
 
-# bun
+# Bun configuration
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
+# Bun completions (macOS specific path)
+if [[ "$OS" == "macos" ]]; then
+    [ -s "/Users/jparsell/.bun/_bun" ] && source "/Users/jparsell/.bun/_bun"
+else
+    [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+fi
+
+# Enable colors for ls
+export CLICOLOR=1
+if [[ "$OS" == "macos" ]]; then
+    export LSCOLORS=ExGxBxDxCxEgEdxbxgxcxd
+else
+    # Linux uses different color format
+    export LS_COLORS='di=1;34:ln=1;36:so=1;31:pi=1;33:ex=1;32:bd=1;34;46:cd=1;34;43:su=0;41:sg=0;46:tw=0;42:ow=0;43'
+fi
+
+# Initialize Starship prompt if available
+if command -v starship &> /dev/null; then
+    eval "$(starship init zsh)"
+fi
+
+# Source additional zsh files from dotfiles
+DOTFILES_ZSH_DIR="$HOME/dotfiles/common/zsh"
+if [ -d "$DOTFILES_ZSH_DIR" ]; then
+    [ -f "$DOTFILES_ZSH_DIR/aws.zsh" ] && source "$DOTFILES_ZSH_DIR/aws.zsh"
+    [ -f "$DOTFILES_ZSH_DIR/aws_utils.zsh" ] && source "$DOTFILES_ZSH_DIR/aws_utils.zsh"
+    [ -f "$DOTFILES_ZSH_DIR/aws_commands.zsh" ] && source "$DOTFILES_ZSH_DIR/aws_commands.zsh"
+    [ -f "$DOTFILES_ZSH_DIR/cli_tools.zsh" ] && source "$DOTFILES_ZSH_DIR/cli_tools.zsh"
+    [ -f "$DOTFILES_ZSH_DIR/fluree_commands.zsh" ] && source "$DOTFILES_ZSH_DIR/fluree_commands.zsh"
+    [ -f "$DOTFILES_ZSH_DIR/tmux.zsh" ] && source "$DOTFILES_ZSH_DIR/tmux.zsh"
+else
+    # Fallback to home directory if dotfiles not found
+    [ -f "$HOME/aws.zsh" ] && source "$HOME/aws.zsh"
+    [ -f "$HOME/aws_utils.zsh" ] && source "$HOME/aws_utils.zsh"
+    [ -f "$HOME/aws_commands.zsh" ] && source "$HOME/aws_commands.zsh"
+    [ -f "$HOME/cli_tools.zsh" ] && source "$HOME/cli_tools.zsh"
+    [ -f "$HOME/fluree_commands.zsh" ] && source "$HOME/fluree_commands.zsh"
+    [ -f "$HOME/tmux.zsh" ] && source "$HOME/tmux.zsh"
+fi
+
+# PR Review Helper Functions
+if [ -f "$HOME/Developer/pr-review/pr-helpers.sh" ]; then
+    source "$HOME/Developer/pr-review/pr-helpers.sh"
+fi
+
+# Claude Code
+export PATH="$HOME/.claude/local:$PATH"
+alias claude="~/.claude/local/claude"
+
+
+# Zsh history configuration for sharing across terminals
+HISTFILE=~/.zsh_history
+HISTSIZE=100000
+SAVEHIST=100000
+setopt SHARE_HISTORY          # Share history between all sessions
+setopt HIST_EXPIRE_DUPS_FIRST # Expire duplicate entries first when trimming history
+setopt HIST_IGNORE_DUPS       # Don't record an entry that was just recorded again
+setopt HIST_IGNORE_ALL_DUPS   # Delete old recorded entry if new entry is a duplicate
+setopt HIST_FIND_NO_DUPS      # Do not display a line previously found
+setopt HIST_SAVE_NO_DUPS      # Don't write duplicate entries in the history file
+setopt HIST_REDUCE_BLANKS     # Remove superfluous blanks before recording entry
+setopt INC_APPEND_HISTORY     # Write to the history file immediately, not when the shell exits
+
+# Atuin shell history (if available)
+if command -v atuin &> /dev/null; then
+    eval "$(atuin init zsh)"
+fi
+
+# Initialize zoxide for smart directory jumping (if available)
+if command -v zoxide &> /dev/null; then
+    eval "$(zoxide init zsh)"
+fi
+
+# Aliases
+if command -v bat &> /dev/null; then
+    alias cat="bat"
+fi
+
+# Platform-specific aliases
+if [[ "$OS" == "linux" ]]; then
+    alias ls='ls --color=auto'
+    alias ll='ls -alF --color=auto'
+    alias la='ls -A --color=auto'
+    alias l='ls -CF --color=auto'
+elif [[ "$OS" == "macos" ]]; then
+    alias ll='ls -alF'
+    alias la='ls -A'
+    alias l='ls -CF'
+fi
+
+# Show all available commands
+show-commands() {
+    echo -e "\033[0;34m=== Shell Aliases ===\033[0m"
+    alias | sort
+    echo ""
+    echo -e "\033[0;34m=== Functions ===\033[0m"
+    declare -F | cut -d" " -f3 | grep -v "^_" | sort
+    echo ""
+    if [ -f "$HOME/Developer/pr-review/pr-helpers.sh" ]; then
+        echo -e "\033[0;34m=== PR Review Commands ===\033[0m"
+        echo "lpr, cpr, vpr, dpr, epr, cenv, cflhubee, cleanpr, recent-prs, search-prs"
+    fi
+}
+
+alias commands="show-commands"
+
+# OS-specific configurations
+if [[ "$OS" == "linux" ]]; then
+    # Linux-specific configurations
+    
+    # Set default editor
+    export EDITOR=nvim
+    export VISUAL=nvim
+    
+    # Add local bin to PATH
+    export PATH="$HOME/.local/bin:$PATH"
+    
+elif [[ "$OS" == "macos" ]]; then
+    # macOS-specific configurations
+    
+    # Homebrew
+    if [ -f /opt/homebrew/bin/brew ]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [ -f /usr/local/bin/brew ]; then
+        eval "$(/usr/local/bin/brew shellenv)"
+    fi
+fi
+
+# Development environment variables (cross-platform)
+export PAGER='less -R'
+export LESS='-R'
+
+# Load any local overrides
+[ -f "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"

@@ -1,0 +1,38 @@
+# System files
+.DS_Store
+*.swp
+*.swo
+*~
+*.tmp
+
+# History files
+.zsh_history
+.zhistory
+.bash_history
+.viminfo
+.lesshst
+
+# Backup files
+*.backup
+*.bak
+*.old
+
+# Plugin directories (managed by package managers)
+common/tmux/plugins/
+!common/tmux/plugins/.gitkeep
+
+# Local overrides
+*.local
+.env
+
+# IDE
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# Cache
+.cache/
+__pycache__/
+*.pyc

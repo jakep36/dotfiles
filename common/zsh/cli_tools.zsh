@@ -61,3 +61,13 @@ triage_bugs() {
         --bind "ctrl-u:execute(echo {} | awk '{print \$1}' | xargs -I % sh -c 'gh issue edit --remove-assignee \"@me\" %')")
     echo "$gh_issue"
 }
+
+# Fix AeroSpace tiling layout
+alias fix='~/dotfiles/fix-aerospace.sh'
+
+# Eza aliases (modern ls replacement)
+alias ls='eza --icons --group-directories-first'
+alias ll='eza -l --icons --group-directories-first'
+alias la='eza -la --icons --group-directories-first'
+alias lt='eza --tree --level=2 --icons --group-directories-first'
+alias l='eza -la --icons --group-directories-first'
