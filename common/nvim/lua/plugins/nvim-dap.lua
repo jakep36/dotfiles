@@ -21,7 +21,7 @@ return {
       port = "${port}",
       executable = {
         command = "node",
-        args = { "/Users/jparsell/bin/dap/src/dapDebugServer.js", "${port}" },
+        args = { os.getenv("HOME") .. "/bin/dap/src/dapDebugServer.js", "${port}" },
       },
     }
 
