@@ -21,6 +21,9 @@
 common/tmux/plugins/
 !common/tmux/plugins/.gitkeep
 
+# Tmux resurrect session files
+common/tmux/resurrect/
+
 # Local overrides
 *.local
 .env
