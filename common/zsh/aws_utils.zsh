@@ -51,6 +51,26 @@ aws_find_instance() {
   echo "$instance"
 }
 
+# Interactively select EC2 instance with fzf
+aws_select_instance() {
+  local state="${1:-running}"
+  
+  echo -e "${AWS_COLOR_GRAY}Fetching EC2 instances...${AWS_COLOR_NC}" >&2
+  
+  local instance=$(aws ec2 describe-instances \
+    --filters "Name=instance-state-name,Values=$state" \
+    --query "Reservations[].Instances[].[InstanceId,Tags[?Key=='Name'].Value|[0]]" \
+    --output text | fzf --prompt="Select instance: " | awk '{print $1}')
+  
+  if [[ -z "$instance" ]]; then
+    echo -e "${AWS_COLOR_YELLOW}No instance selected.${AWS_COLOR_NC}" >&2
+    return 1
+  fi
+  
+  echo -e "${AWS_COLOR_GREEN}Selected instance: $instance${AWS_COLOR_NC}" >&2
+  echo "$instance"
+}
+
 # Find ECS cluster by name pattern
 aws_find_cluster() {
   local name_pattern="${1:-*}"
@@ -147,9 +167,41 @@ aws_setup_tunnel() {
   local local_port="${4:-8080}"
   local background="${5:-true}"
 
-  if [[ -z "$instance_id" || -z "$target_host" ]]; then
-    echo -e "${AWS_COLOR_RED}Instance ID and target host are required.${AWS_COLOR_NC}" >&2
-    return 1
+  # If no instance_id provided, select interactively
+  if [[ -z "$instance_id" ]]; then
+    echo -e "${AWS_COLOR_YELLOW}No instance ID provided, selecting interactively...${AWS_COLOR_NC}" >&2
+    instance_id=$(aws_select_instance)
+    if [[ -z "$instance_id" ]]; then
+      echo -e "${AWS_COLOR_RED}No instance selected.${AWS_COLOR_NC}" >&2
+      return 1
+    fi
+  fi
+
+  # If no target_host provided, prompt for it
+  if [[ -z "$target_host" ]]; then
+    echo -e "${AWS_COLOR_YELLOW}No target host provided.${AWS_COLOR_NC}" >&2
+    echo -n "Enter target host (e.g., internal-elb-123.amazonaws.com): "
+    read target_host
+    if [[ -z "$target_host" ]]; then
+      echo -e "${AWS_COLOR_RED}Target host is required.${AWS_COLOR_NC}" >&2
+      return 1
+    fi
+  fi
+
+  # If using defaults for ports, ask if user wants to customize
+  if [[ "$#" -lt 3 ]]; then
+    echo -e "${AWS_COLOR_GRAY}Using default ports (remote: $remote_port, local: $local_port)${AWS_COLOR_NC}" >&2
+    echo -n "Press Enter to accept defaults or type 'c' to customize: "
+    read customize
+    if [[ "$customize" == "c" || "$customize" == "C" ]]; then
+      echo -n "Enter remote port (default $remote_port): "
+      read custom_remote
+      [[ -n "$custom_remote" ]] && remote_port="$custom_remote"
+      
+      echo -n "Enter local port (default $local_port): "
+      read custom_local
+      [[ -n "$custom_local" ]] && local_port="$custom_local"
+    fi
   fi
 
   echo -e "${AWS_COLOR_GRAY}Setting up tunnel: localhost:$local_port -> $target_host:$remote_port via $instance_id${AWS_COLOR_NC}" >&2

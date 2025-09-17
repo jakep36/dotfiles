@@ -23,9 +23,10 @@ opt.expandtab = false
 opt.relativenumber = false
 if vim.fn.has("nvim-0.11") == 1 then
   opt.smoothscroll = true
-  opt.foldexpr = "v:lua.require'lazyvim.util'.ui.foldexpr()"
+  opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
   opt.foldmethod = "expr"
   opt.foldtext = ""
+  -- opt.foldtext = "v:lua.vim.treesitter.foldtext()"
   vim.diagnostic.config({
     virtual_text = { virtual_lines = true },
   })

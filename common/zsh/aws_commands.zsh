@@ -223,7 +223,7 @@ select_route53_host() {
     echo "$host_record"
 }
 
-aws_setup_tunnel() {
+aws_setup_tunnel_interactive() {
     local ec2_instance_id=$(select_ec2_instance)
     if [[ -z "$ec2_instance_id" ]]; then
         echo "No EC2 instance selected."
