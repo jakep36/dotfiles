@@ -1,5 +1,5 @@
 # Unified Aerospace configuration for consistency with Linux/Hyprland
-# This config prioritizes muscle memory across Mac and Linux
+# This config prioritizes muscle memory across macOS and Linux
 
 # Start AeroSpace at login
 start-at-login = true
