@@ -4,7 +4,7 @@ return {
   lazy = false,
   opts = function()
     local config = {
-      terminal_cmd = vim.fn.expand("~/.claude/local/claude") .. " --ide", -- Add --ide flag for integration
+      terminal_cmd = "claude", -- Launch Claude Code directly
       diff_opts = {
         layout = "vertical", -- Use vertical layout
         open_in_new_tab = true, -- Open in new tab to isolate from existing buffers
@@ -34,6 +34,17 @@ return {
   end,
   config = true,
   keys = {
-    -- Your keymaps here
+    -- Claude Code terminal
+    { "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude Code" },
+    { "<leader>af", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude Code" },
+    { "<leader>am", "<cmd>ClaudeCodeSelectModel<cr>", desc = "Select Model" },
+
+    -- Send to Claude
+    { "<leader>as", "<cmd>ClaudeCodeSend<cr>", mode = "v", desc = "Send selection to Claude" },
+    { "<leader>ab", "<cmd>ClaudeCodeAdd<cr>", desc = "Add buffer to Claude" },
+
+    -- Diff management
+    { "<leader>aa", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
+    { "<leader>ad", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
   },
 }
