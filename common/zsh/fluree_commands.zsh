@@ -1,5 +1,22 @@
 aws_env() {
-    export AWS_PROFILE=$(cat ~/.aws/config | grep '\[profile' | awk '{print $2}' | sed 's/]//g' | fzf)
+    local profile=$(grep '\[profile' ~/.aws/config | awk '{print $2}' | sed 's/]//g' | fzf)
+    if [[ -z "$profile" ]]; then
+        echo "No profile selected."
+        return
+    fi
+    export AWS_PROFILE="$profile"
+
+    # Extract region from the selected profile (handles variable whitespace)
+    local region=$(sed -n "/\[profile $profile\]/,/^\[/p" ~/.aws/config | grep -m1 '^region' | sed 's/.*=[[:space:]]*//')
+    if [[ -n "$region" ]]; then
+        export AWS_REGION="$region"
+        export AWS_DEFAULT_REGION="$region"
+        echo "AWS_PROFILE=$AWS_PROFILE"
+        echo "AWS_REGION=$AWS_REGION"
+    else
+        echo "AWS_PROFILE=$AWS_PROFILE"
+        echo "No region found in profile config"
+    fi
 }
 
 debug_nexus_users() {

@@ -258,3 +258,113 @@ aws_ssm_session() {
 
     aws ssm start-session --target "$ec2_instance_id"
 }
+
+# CloudFormation stack management
+
+cfn_list_stacks() {
+    local status_filter="${1:-CREATE_COMPLETE,UPDATE_COMPLETE,ROLLBACK_COMPLETE,DELETE_FAILED,ROLLBACK_FAILED}"
+    aws cloudformation list-stacks \
+        --stack-status-filter $(echo $status_filter | tr ',' ' ') \
+        --query 'StackSummaries[*].[StackName,StackStatus,CreationTime]' \
+        --output text | sort -k3 -r
+}
+
+cfn_delete_failed() {
+    echo "Fetching failed stacks..."
+    local stacks=$(aws cloudformation list-stacks \
+        --stack-status-filter DELETE_FAILED ROLLBACK_FAILED \
+        --query 'StackSummaries[*].[StackName,StackStatus]' \
+        --output text)
+
+    if [[ -z "$stacks" ]]; then
+        echo "No failed stacks found."
+        return
+    fi
+
+    local selected=$(echo "$stacks" | fzf --multi \
+        --prompt="Select stacks to force delete (TAB to multi-select)> " \
+        --header="Stack Name                          Status" \
+        --preview="aws cloudformation describe-stack-events --stack-name {1} --query 'StackEvents[?ResourceStatus==\`CREATE_FAILED\` || ResourceStatus==\`DELETE_FAILED\`].[LogicalResourceId,ResourceStatusReason]' --output table 2>/dev/null | head -20")
+
+    if [[ -z "$selected" ]]; then
+        echo "No stacks selected."
+        return
+    fi
+
+    echo ""
+    echo "Will force delete the following stacks:"
+    echo "$selected" | awk '{print "  - " $1}'
+    echo ""
+    echo -n "Confirm? [y/N] "
+    read confirm
+
+    if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+        echo "Cancelled."
+        return
+    fi
+
+    echo "$selected" | while read -r line; do
+        local stack_name=$(echo "$line" | awk '{print $1}')
+        echo "Force deleting: $stack_name"
+        aws cloudformation delete-stack --stack-name "$stack_name" --deletion-mode FORCE_DELETE_STACK
+    done
+
+    echo ""
+    echo "Delete initiated. Check status with: cfn_list_stacks DELETE_IN_PROGRESS"
+}
+
+cfn_delete_stack() {
+    echo "Fetching stacks..."
+    local stacks=$(aws cloudformation list-stacks \
+        --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE ROLLBACK_COMPLETE UPDATE_ROLLBACK_COMPLETE CREATE_FAILED DELETE_FAILED ROLLBACK_FAILED \
+        --query 'StackSummaries[*].[StackName,StackStatus]' \
+        --output text)
+
+    if [[ -z "$stacks" ]]; then
+        echo "No stacks found."
+        return
+    fi
+
+    local selected=$(echo "$stacks" | fzf --multi \
+        --prompt="Select stacks to delete (TAB to multi-select)> " \
+        --header="Stack Name                          Status" \
+        --preview="aws cloudformation describe-stacks --stack-name {1} --query 'Stacks[0].Outputs' --output table 2>/dev/null")
+
+    if [[ -z "$selected" ]]; then
+        echo "No stacks selected."
+        return
+    fi
+
+    echo ""
+    echo "Will delete the following stacks:"
+    echo "$selected" | awk '{print "  - " $1}'
+    echo ""
+    echo -n "Confirm? [y/N] "
+    read confirm
+
+    if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+        echo "Cancelled."
+        return
+    fi
+
+    echo "$selected" | while read -r line; do
+        local stack_name=$(echo "$line" | awk '{print $1}')
+        local stack_status=$(echo "$line" | awk '{print $2}')
+        # Auto force delete for failed stacks
+        if [[ "$stack_status" == "DELETE_FAILED" || "$stack_status" == "ROLLBACK_FAILED" ]]; then
+            echo "Force deleting: $stack_name (was $stack_status)"
+            aws cloudformation delete-stack --stack-name "$stack_name" --deletion-mode FORCE_DELETE_STACK
+        else
+            echo "Deleting: $stack_name"
+            aws cloudformation delete-stack --stack-name "$stack_name"
+        fi
+    done
+
+    echo ""
+    echo "Delete initiated. Check status with: cfn_list_stacks DELETE_IN_PROGRESS"
+}
+
+# Short aliases
+alias cfd="cfn_delete_stack"    # delete stacks (auto force-deletes failed ones)
+alias cfx="cfn_delete_failed"   # show only failed/stuck stacks
+alias cfls="cfn_list_stacks"    # list stacks
