@@ -124,6 +124,17 @@ vim.pack.add({
   -- Drop if: you prefer using sed/rg from the terminal or snacks.picker grep.
   "https://github.com/MagicDuck/grug-far.nvim",
 
+  -- undotree: Visual undo history browser. Neovim undo is branching (not linear),
+  -- so you can lose states by undoing past a fork. This shows every branch and lets
+  -- you jump to any past state. Toggle with <leader>cu.
+  -- Drop if: you never need to recover lost undo branches.
+  "https://github.com/mbbill/undotree",
+
+  -- nvim-bqf: Better quickfix window with preview pane, fuzzy filtering, and signs.
+  -- Enhances the quickfix list used by grep results, LSP references, diagnostics, etc.
+  -- Drop if: you rarely use the quickfix list or the default is enough.
+  "https://github.com/kevinhwang91/nvim-bqf",
+
   -------------------------------------------------------
   -- Treesitter
   -------------------------------------------------------
@@ -142,6 +153,11 @@ vim.pack.add({
   -- Type `<div>` and it inserts `</div>`. Rename opening tag and closing tag updates.
   -- Drop if: you don't write HTML/JSX/TSX.
   "https://github.com/windwp/nvim-ts-autotag",
+
+  -- nvim-treesitter-context: Shows the function/class/block scope at the top of the
+  -- screen when you scroll deep into a long function. Toggle with <leader>ut.
+  -- Drop if: you prefer no sticky context header.
+  "https://github.com/nvim-treesitter/nvim-treesitter-context",
 
   -------------------------------------------------------
   -- Coding
@@ -284,4 +300,18 @@ vim.pack.add({
   -- using <C-h/j/k/l>. Without this, those keys only move between nvim windows.
   -- Drop if: you don't use tmux, or you navigate panes with tmux prefix keys instead.
   "https://github.com/christoomey/vim-tmux-navigator",
+
+  -------------------------------------------------------
+  -- Scrolling
+  -------------------------------------------------------
+
+  -- gitlinker.nvim: Copy GitHub/GitLab/Bitbucket permalink URLs for current line or selection.
+  -- Use <leader>gy in normal or visual mode to copy a permalink to clipboard.
+  -- Drop if: you use Snacks.gitbrowse (<leader>gY) instead.
+  "https://github.com/linrongbin16/gitlinker.nvim",
+
+  -- neoscroll.nvim: Smooth scrolling for <C-u>, <C-d>, <C-b>, <C-f>, zt, zz, zb.
+  -- Animates scroll instead of jumping, making it easier to track cursor position.
+  -- Drop if: you prefer instant jumps or find animation distracting.
+  "https://github.com/karb94/neoscroll.nvim",
 }, { load = true })

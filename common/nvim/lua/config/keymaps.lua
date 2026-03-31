@@ -111,6 +111,12 @@ map("n", "<leader>-", "<C-W>s", { desc = "Split Window Below", remap = true })
 map("n", "<leader>|", "<C-W>v", { desc = "Split Window Right", remap = true })
 map("n", "<leader>wd", "<C-W>c", { desc = "Delete Window", remap = true })
 
+-- Undo tree
+map("n", "<leader>cu", "<cmd>UndotreeToggle<cr>", { desc = "Undo Tree" })
+
+-- Treesitter context toggle
+map("n", "<leader>ut", "<cmd>TSContext toggle<cr>", { desc = "Toggle Treesitter Context" })
+
 -- Redraw
 map("n", "<leader>ur", "<Cmd>nohlsearch<Bar>diffupdate<Bar>normal! <C-L><CR>", { desc = "Redraw / Clear hlsearch" })
 
@@ -143,6 +149,9 @@ map({ "n", "x" }, "<leader>gB", function() Snacks.gitbrowse() end, { desc = "Git
 map({ "n", "x" }, "<leader>gY", function()
   Snacks.gitbrowse({ open = function(url) vim.fn.setreg("+", url) end, notify = false })
 end, { desc = "Git Browse (copy)" })
+
+-- Git permalink (copy to clipboard)
+map({ "n", "v" }, "<leader>gy", "<cmd>GitLink<cr>", { desc = "Copy Git Permalink" })
 
 -- GitHub
 map("n", "<leader>gi", function() Snacks.picker.gh_issue() end, { desc = "GitHub Issues (open)" })

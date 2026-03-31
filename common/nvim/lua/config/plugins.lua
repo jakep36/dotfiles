@@ -40,6 +40,7 @@ require("which-key").setup({
     { "<leader>q", group = "session" },
     { "<leader>r", group = "refactor" },
     { "<leader>s", group = "search" },
+    { "<leader>u", group = "ui/toggle" },
     { "<leader>w", group = "window" },
     { "<leader>x", group = "diagnostics" },
   },
@@ -227,3 +228,19 @@ require("codediff").setup({
     },
   },
 })
+
+-- Smooth scrolling
+require("neoscroll").setup({ duration_multiplier = 0.3 })
+
+-- Git permalinks
+require("gitlinker").setup()
+
+-- Treesitter context (sticky scope header)
+require("treesitter-context").setup({
+  max_lines = 3,
+})
+
+-- Better quickfix
+require("bqf").setup()
+
+-- Undotree (no setup needed, just commands)
