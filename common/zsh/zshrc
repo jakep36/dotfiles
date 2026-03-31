@@ -201,6 +201,6 @@ zle -N zle-line-init
 
 echo -ne '\e[5 q' # Set beam cursor on shell startup
 ssh-add --apple-load-keychain -q 2>/dev/null
-export SONARCLOUD_TOKEN=d5a397cc5b0181864eace8019593c5d25ce5bd43
+# SONARCLOUD_TOKEN: set in ~/.zshrc.local (do not commit secrets)
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
