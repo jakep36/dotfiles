@@ -62,6 +62,27 @@ triage_bugs() {
     echo "$gh_issue"
 }
 
+# Search Claude Code audit log with fzf, ctrl-y copies the command to clipboard
+claude-audit-tail() {
+    tail -f ~/.claude/command-audit.log | perl -pe 's/\0/\n───\n/g'
+}
+
+claude-audit() {
+    local log="$HOME/.claude/command-audit.log"
+    if [[ ! -f "$log" ]]; then
+        echo "No audit log found at $log"
+        return 1
+    fi
+    # Entries are null-byte delimited and may contain newlines
+    perl -0777 -ne '@r = grep { length } split(/\0/); print join("\0", reverse @r), "\0"' < "$log" | \
+        fzf --read0 --height 80% --layout=reverse \
+            --prompt="Claude audit > " \
+            --preview 'printf "%s" {} | sed "1s/^\[[^]]*\] [^:]*: //"' \
+            --preview-window=up:10:wrap \
+            --header="enter: copy command │ ctrl-c: cancel" \
+            --bind 'enter:become(printf "%s" {} | sed "1s/^\[[^]]*\] [^:]*: //" | pbcopy && echo "Copied to clipboard")'
+}
+
 # Fix AeroSpace tiling layout
 alias fix='~/dotfiles/fix-aerospace.sh'
 

@@ -1,5 +1,10 @@
 aws_env() {
-    local profile=$(grep '\[profile' ~/.aws/config | awk '{print $2}' | sed 's/]//g' | fzf)
+    local profile
+    if [[ -n "$1" ]]; then
+        profile="$1"
+    else
+        profile=$(grep '\[profile' ~/.aws/config | awk '{print $2}' | sed 's/]//g' | fzf)
+    fi
     if [[ -z "$profile" ]]; then
         echo "No profile selected."
         return

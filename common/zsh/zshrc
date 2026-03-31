@@ -25,6 +25,9 @@ if [[ "$OS" == "macos" ]]; then
     export PATH="$HOME/.opencode/bin:$PATH"
 fi
 
+# Cargo/Rust
+export PATH="$HOME/.cargo/bin:$PATH"
+
 # Bun configuration
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
@@ -59,6 +62,7 @@ if [ -d "$DOTFILES_ZSH_DIR" ]; then
     [ -f "$DOTFILES_ZSH_DIR/cli_tools.zsh" ] && source "$DOTFILES_ZSH_DIR/cli_tools.zsh"
     [ -f "$DOTFILES_ZSH_DIR/fluree_commands.zsh" ] && source "$DOTFILES_ZSH_DIR/fluree_commands.zsh"
     [ -f "$DOTFILES_ZSH_DIR/tmux.zsh" ] && source "$DOTFILES_ZSH_DIR/tmux.zsh"
+    [ -f "$DOTFILES_ZSH_DIR/multiplexer.zsh" ] && source "$DOTFILES_ZSH_DIR/multiplexer.zsh"
 else
     # Fallback to home directory if dotfiles not found
     [ -f "$HOME/aws.zsh" ] && source "$HOME/aws.zsh"
@@ -67,6 +71,7 @@ else
     [ -f "$HOME/cli_tools.zsh" ] && source "$HOME/cli_tools.zsh"
     [ -f "$HOME/fluree_commands.zsh" ] && source "$HOME/fluree_commands.zsh"
     [ -f "$HOME/tmux.zsh" ] && source "$HOME/tmux.zsh"
+    [ -f "$HOME/multiplexer.zsh" ] && source "$HOME/multiplexer.zsh"
 fi
 
 # PR Review Helper Functions
@@ -76,6 +81,7 @@ fi
 
 # Claude Code
 export PATH="$HOME/.claude/local:$PATH"
+export ENABLE_LSP_TOOLS=1
 
 
 # Zsh history configuration for sharing across terminals
@@ -128,6 +134,9 @@ show-commands() {
     echo ""
     if [ -f "$HOME/Developer/pr-review/pr-helpers.sh" ]; then
         echo -e "\033[0;34m=== PR Review Commands ===\033[0m"
+
+
+preexec() { echo -ne '\e[5 q' ;} # Set beam cursor for each new prompt
         echo "lpr, cpr, vpr, dpr, epr, cenv, cflhubee, cleanpr, recent-prs, search-prs"
     fi
 }
@@ -162,3 +171,36 @@ export LESS='-R'
 
 # Load any local overrides
 [ -f "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"
+
+# bun completions
+[ -s "/Users/jparsell/.bun/_bun" ] && source "/Users/jparsell/.bun/_bun"
+
+
+bindkey -v 
+export KEYTIMEOUT=1
+export EDITOR=nvim
+export VISUAL=nvim
+
+autoload edit-command-line
+zle -N edit-command-line	
+
+bindkey -M vicmd v edit-command-line
+function zle-keymap-select () {
+  case $KEYMAP in
+    vicmd) echo -ne '\e[1 q';; # Block cursor for normal mode
+    viins|main) echo -ne '\e[5 q';; # Beam cursor for insert mode
+  esac
+}
+zle -N zle-keymap-select
+
+zle-line-init() {
+  zle -K viins # Ensure vi insert mode is initiated
+  echo -ne "\e[5 q" # Set beam cursor on startup
+}
+zle -N zle-line-init
+
+echo -ne '\e[5 q' # Set beam cursor on shell startup
+ssh-add --apple-load-keychain -q 2>/dev/null
+export SONARCLOUD_TOKEN=d5a397cc5b0181864eace8019593c5d25ce5bd43
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
