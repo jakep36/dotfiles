@@ -1,0 +1,161 @@
+// Zellij Configuration
+// Designed to mirror tmux workflow while providing modern features
+
+// Use non-colliding keybindings to avoid vim conflicts
+keybinds clear-defaults=true {
+    // Locked mode is default - similar to tmux prefix workflow
+    locked {
+        // Session management (similar to tmux prefix+t with sesh)
+        bind "Ctrl s" "t" { LaunchOrFocusPlugin "session-manager" { floating true; }; }
+
+        // Vim-style navigation (Ctrl+h/j/k/l) - similar to tmux vim-navigator
+        bind "Ctrl h" { MoveFocusOrTab "Left"; }
+        bind "Ctrl j" { MoveFocus "Down"; }
+        bind "Ctrl k" { MoveFocus "Up"; }
+        bind "Ctrl l" { MoveFocusOrTab "Right"; }
+
+        // Enter tmux-like mode with Ctrl+S prefix (just like tmux)
+        bind "Ctrl s" { SwitchToMode "Tmux"; }
+    }
+
+    // Tmux-like mode for other operations
+    tmux {
+        bind "[" { SwitchToMode "Scroll"; }
+        bind "Ctrl s" { Write 19; SwitchToMode "Locked"; }
+        bind "\"" { NewPane "Down"; SwitchToMode "Locked"; }
+        bind "%" { NewPane "Right"; SwitchToMode "Locked"; }
+        bind "z" { TogglePaneFrames; SwitchToMode "Locked"; }
+        bind "c" { NewTab; SwitchToMode "Locked"; }
+        bind "," { SwitchToMode "RenameTab"; }
+        bind "p" { GoToPreviousTab; SwitchToMode "Locked"; }
+        bind "n" { GoToNextTab; SwitchToMode "Locked"; }
+        bind "Left" { MoveFocus "Left"; }
+        bind "Right" { MoveFocus "Right"; }
+        bind "Down" { MoveFocus "Down"; }
+        bind "Up" { MoveFocus "Up"; }
+        bind "h" { MoveFocus "Left"; }
+        bind "l" { MoveFocus "Right"; }
+        bind "j" { MoveFocus "Down"; }
+        bind "k" { MoveFocus "Up"; }
+        bind "o" { FocusNextPane; }
+        bind "d" { Detach; }
+        bind "Space" { NextSwapLayout; }
+        bind "x" { CloseFocus; SwitchToMode "Locked"; }
+
+        // Custom bindings to match your tmux setup
+        bind "\\" { NewPane "Right"; SwitchToMode "Locked"; }
+        bind "-" { NewPane "Down"; SwitchToMode "Locked"; }
+        bind "f" { ToggleFloatingPanes; SwitchToMode "Locked"; }
+        bind "t" { LaunchOrFocusPlugin "session-manager" { floating true; }; SwitchToMode "Locked"; }
+        bind "r" {
+            Run "zellij" "action" "reload-config";
+            WriteChars "Config reloaded";
+            SwitchToMode "Locked";
+        }
+    }
+
+    // Pane resize mode
+    resize {
+        bind "Ctrl s" { SwitchToMode "Locked"; }
+        bind "h" "Left" { Resize "Increase Left"; }
+        bind "j" "Down" { Resize "Increase Down"; }
+        bind "k" "Up" { Resize "Increase Up"; }
+        bind "l" "Right" { Resize "Increase Right"; }
+        bind "H" { Resize "Decrease Left"; }
+        bind "J" { Resize "Decrease Down"; }
+        bind "K" { Resize "Decrease Up"; }
+        bind "L" { Resize "Decrease Right"; }
+        bind "=" { Resize "Increase"; }
+        bind "-" { Resize "Decrease"; }
+    }
+
+    // Scroll mode (similar to tmux copy mode)
+    scroll {
+        bind "Ctrl s" { SwitchToMode "Locked"; }
+        bind "e" { EditScrollback; SwitchToMode "Locked"; }
+        bind "s" { SwitchToMode "EnterSearch"; }
+        bind "Ctrl c" { ScrollToBottom; SwitchToMode "Locked"; }
+        bind "j" "Down" { ScrollDown; }
+        bind "k" "Up" { ScrollUp; }
+        bind "Ctrl f" "PageDown" "Right" "l" { PageScrollDown; }
+        bind "Ctrl b" "PageUp" "Left" "h" { PageScrollUp; }
+        bind "d" { HalfPageScrollDown; }
+        bind "u" { HalfPageScrollUp; }
+    }
+
+    // Search mode
+    search {
+        bind "Ctrl s" { SwitchToMode "Locked"; }
+        bind "Ctrl c" { ScrollToBottom; SwitchToMode "Locked"; }
+        bind "j" "Down" { ScrollDown; }
+        bind "k" "Up" { ScrollUp; }
+        bind "Ctrl f" "PageDown" "Right" "l" { PageScrollDown; }
+        bind "Ctrl b" "PageUp" "Left" "h" { PageScrollUp; }
+        bind "d" { HalfPageScrollDown; }
+        bind "u" { HalfPageScrollUp; }
+        bind "n" { Search "down"; }
+        bind "p" { Search "up"; }
+        bind "c" { SearchToggleOption "CaseSensitivity"; }
+        bind "w" { SearchToggleOption "Wrap"; }
+        bind "o" { SearchToggleOption "WholeWord"; }
+    }
+
+    // Tab rename mode
+    renametab {
+        bind "Ctrl c" { SwitchToMode "Locked"; }
+        bind "Esc" { UndoRenameTab; SwitchToMode "Locked"; }
+    }
+
+    // Session mode for session management
+    session {
+        bind "Ctrl s" { SwitchToMode "Locked"; }
+        bind "Ctrl c" { SwitchToMode "Locked"; }
+        bind "d" { Detach; }
+        bind "w" {
+            LaunchOrFocusPlugin "session-manager" {
+                floating true
+                move_to_focused_tab true
+            };
+            SwitchToMode "Locked"
+        }
+    }
+}
+
+// Default to locked mode (similar to tmux behavior)
+default_mode "locked"
+
+// Mouse support (like tmux)
+mouse_mode true
+
+// Pane frames (similar to tmux borders)
+pane_frames true
+
+// Theme similar to your catppuccin tmux theme
+theme "catppuccin-mocha"
+
+// Session serialization (like tmux-resurrect)
+session_serialization true
+
+// Simplified UI
+simplified_ui false
+
+// Default shell
+default_shell "zsh"
+
+// Scrollback buffer (similar to tmux history-limit)
+scrollback_editor "nvim"
+
+// Copy command (similar to tmux-yank)
+copy_command "pbcopy"
+
+// Layout directory
+layout_dir "/Users/jparsell/.config/zellij/layouts"
+
+// Plugin directory
+plugin_dir "/Users/jparsell/.config/zellij/plugins"
+
+// Auto-attach behavior
+auto_attach true
+
+// Mirror session (like tmux)
+mirror_session true

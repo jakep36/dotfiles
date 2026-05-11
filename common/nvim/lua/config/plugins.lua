@@ -49,7 +49,7 @@ require("which-key").setup({
 -- Snacks
 require("snacks").setup({
   bigfile = { enabled = true },
-  notifier = { enabled = true },
+  notifier = { enabled = false },
   quickfile = { enabled = true },
   statuscolumn = { enabled = true },
   words = { enabled = true },
@@ -171,6 +171,9 @@ require("conform").setup({
 })
 
 -- Linting (nvim-lint has no setup(), just configure and use try_lint)
+-- Override nvim-lint's built-in defaults (text/markdown/rst default to vale, which isn't installed)
+require("lint").linters_by_ft = {}
+
 vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
   callback = function()
     require("lint").try_lint()

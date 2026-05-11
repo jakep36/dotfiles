@@ -160,10 +160,6 @@ map("n", "<leader>gp", function() Snacks.picker.gh_pr() end, { desc = "GitHub PR
 map("n", "<leader>gP", function() Snacks.picker.gh_pr({ state = "all" }) end, { desc = "GitHub PRs (all)" })
 map("n", "<leader>gr", function() Snacks.picker.gh_repo() end, { desc = "GitHub Repositories" })
 
--- Notifications
-map("n", "<leader>un", function() Snacks.notifier.hide() end, { desc = "Dismiss All Notifications" })
-map("n", "<leader>uN", function() Snacks.notifier.show_history() end, { desc = "Notification History" })
-
 -- Terminal
 map({ "n", "t" }, "<c-/>", function() Snacks.terminal() end, { desc = "Toggle Terminal" })
 map({ "n", "t" }, "<c-_>", function() Snacks.terminal() end, { desc = "which_key_ignore" })
