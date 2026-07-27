@@ -26,6 +26,14 @@ logg() {
         --bind "ctrl-e:execute(echo {} | grep -o '[a-f0-9]\{7\}' | head -1 | xargs -I % sh -c 'gh browse %')"
 }
 
+# Graphite stack view: gt log short's tree with PR numbers appended
+gtls() {
+    gt log --no-interactive | awk '
+        /◯|◉/ { if (buf != "") print buf; buf = $0; next }
+        /PR #[0-9]+/ { if (buf != "") { match($0, /#[0-9]+/); print buf "  " substr($0, RSTART, RLENGTH); buf = "" } next }
+        END { if (buf != "") print buf }'
+}
+
 # Function to create or attach to tmux sessions
 create_tmux_session() {
     local RESULT="$1"
