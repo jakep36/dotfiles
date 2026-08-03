@@ -1,0 +1,64 @@
+# herdr configuration — tmux-style keybindings
+# Mirrors ~/dotfiles/common/tmux/tmux.conf muscle memory
+
+[keys]
+# Match tmux prefix (Ctrl+S)
+prefix = "ctrl+s"
+
+# Opt+1..9 switches workspaces, like tmux M-1..9 session switching
+switch_workspace = "alt+1..9"
+
+# Splits: \ for side-by-side, - for stacked (same as tmux bindings)
+split_vertical = 'prefix+\'
+split_horizontal = "prefix+minus"
+
+# prefix+t opens the workspace picker, like the sesh picker in tmux
+workspace_picker = "prefix+t"
+
+# Rename workspace with prefix+$, like tmux session rename
+rename_workspace = 'prefix+$'
+
+# Seamless ctrl+h/j/k/l across herdr panes and vim splits (vim-herdr-navigation
+# plugin, the vim-tmux-navigator equivalent). Nvim side is loaded from the
+# vim-tmux-navigator spec in common/nvim.
+[[keys.command]]
+key = "ctrl+h"
+type = "plugin_action"
+command = "vim-herdr-navigation.left"
+description = "navigate left (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+j"
+type = "plugin_action"
+command = "vim-herdr-navigation.down"
+description = "navigate down (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+k"
+type = "plugin_action"
+command = "vim-herdr-navigation.up"
+description = "navigate up (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+l"
+type = "plugin_action"
+command = "vim-herdr-navigation.right"
+description = "navigate right (vim/herdr)"
+
+# Toggle the reviewr sidebar (review agent diffs, comment, send back)
+[[keys.command]]
+key = "cmd+r"
+type = "plugin_action"
+command = "persiyanov.reviewr.toggle"
+description = "toggle reviewr sidebar"
+
+# Show workspace numbers (reported by idx-sync.sh) so alt+1..9 targets are visible
+[ui.sidebar.spaces]
+rows = [[{ token = "$idx", dim = true }, "state_icon", "workspace"], ["branch", "git_status"]]
+
+# Play sounds when agents change state in background workspaces
+[ui.sound]
+enabled = false
+
+[ui]
+agent_panel_sort = "spaces"

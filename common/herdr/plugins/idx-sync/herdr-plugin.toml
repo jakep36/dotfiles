@@ -1,0 +1,21 @@
+id = "idx-sync"
+name = "Workspace index sync"
+version = "0.1.0"
+min_herdr_version = "0.7.0"
+description = "Shows workspace numbers in the sidebar by syncing an idx metadata token"
+platforms = ["macos", "linux"]
+
+[[startup]]
+command = ["./sync.sh"]
+
+[[events]]
+on = "workspace.created"
+command = ["./sync.sh"]
+
+[[events]]
+on = "workspace.closed"
+command = ["./sync.sh"]
+
+[[events]]
+on = "workspace.moved"
+command = ["./sync.sh"]
