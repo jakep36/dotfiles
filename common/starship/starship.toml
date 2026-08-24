@@ -1,0 +1,35 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Everything not mentioned here keeps starship's defaults. The only structural
+# change is slotting custom.gitbutler in right after $directory, which is where
+# $git_branch would otherwise sit; $all covers the rest in default order.
+format = """
+$username\
+$hostname\
+$localip\
+$shlvl\
+$singularity\
+$kubernetes\
+$nats\
+$directory\
+${custom.gitbutler}\
+$all\
+$character"""
+
+[git_branch]
+# In a GitButler workspace HEAD is always the synthetic gitbutler/workspace
+# ref, which says nothing about the work in flight. Hide it and let
+# custom.gitbutler describe the workspace instead. Normal repos are unaffected.
+ignore_branches = ['gitbutler/workspace']
+
+[custom.gitbutler]
+description = 'Target branch and applied stacks of a GitButler workspace'
+command = '$HOME/dotfiles/common/starship/gitbutler.sh'
+require_repo = true
+# --check exits non-zero outside a GitButler workspace, which hides the module
+# so git_branch renders as usual. Starship keeps a module with empty output
+# visible, so this gate is what suppresses a bare symbol in normal repos.
+when = '$HOME/dotfiles/common/starship/gitbutler.sh --check'
+format = 'on [$symbol$output]($style) '
+symbol = '🦋 '
+style = 'bold purple'

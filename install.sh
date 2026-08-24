@@ -81,6 +81,13 @@ install_common() {
         backup_config "$HOME/.config/lazygit"
         stow -d "$DOTFILES_DIR/common" -t "$HOME/.config" lazygit
     fi
+
+    # Starship (single file, and gitbutler.sh stays in the repo since
+    # starship.toml refers to it by absolute path)
+    if [[ -f "$DOTFILES_DIR/common/starship/starship.toml" ]]; then
+        backup_config "$HOME/.config/starship.toml"
+        ln -sfn "$DOTFILES_DIR/common/starship/starship.toml" "$HOME/.config/starship.toml"
+    fi
     
     print_info "Common dotfiles installed!"
 }
